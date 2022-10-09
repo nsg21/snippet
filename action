@@ -1,0 +1,28 @@
+# must be run with .
+# List actions defined in local notes.txt and present a menu to select and
+# execute them. Actions are executed via . , so can set variables, etc.
+
+# if [[ $SHLVL -gt 1 ]] ;
+# then
+#   echo start with
+#   echo . act $@
+# else
+if [[ ${#@} -gt 0 ]] ; then
+  act=$1
+  shift
+  # show action content
+  (tput setaf 13 ; snippet.pl "$act" ; tput sgr0) 1>&2
+  # execute it
+  . <(snippet.pl "$act")
+else
+  readarray -t local_actions < <(snippet.pl | sed -n '/Action:/{s/.*:\s\+\(\S\+\)/\1/;p}')
+  COLUMNS=0
+  select act in "${local_actions[@]}"
+  do
+    # show action content
+    (tput setaf 13 ; snippet.pl "$act" ; tput sgr0) 1>&2
+    # execute it
+    . <(snippet.pl "$act")
+  done
+fi
+# fi

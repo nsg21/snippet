@@ -1,0 +1,36 @@
+Partial: .bash_aliases {{{
+# snippet alias and completion rules for it {{{
+alias snippet='snippet.pl'
+_snippet_completion ()
+{
+  if [[ ${#COMP_WORDS[@]} != 2 ]] ; then
+    COMPREPLY=($(compgen -A file ${COMP_WORDS[-1]}))
+    return
+  fi
+  COMPREPLY=($(compgen -W "$(snippet.pl)" "${COMP_WORDS[1]}"))
+}
+# complete -F _snippet_completion snippet
+# }}}
+# act alias and completion rules for it {{{
+# complete available actions as second argument of the act alias
+# complete first word to one of actions, rest to files
+_act_completion ()
+{
+  if [[ ${#COMP_WORDS[@]} != 2 ]] ; then
+    COMPREPLY=($(compgen -A file ${COMP_WORDS[-1]}))
+    return
+  fi
+  COMPREPLY=($(compgen -W "$(snippet.pl | sed -n 's/Action: *//p')" "${COMP_WORDS[1]}"))
+}
+alias act=". action"
+complete -F _act_completion act
+# }}}
+}}}
+
+Action: install {{{
+ln -s -f $PWD/action ~/bin/action
+ln -s -f $PWD/snippet.pl ~/bin/snippet.pl
+}}}
+Action: test {{{
+echo test $1
+}}}
